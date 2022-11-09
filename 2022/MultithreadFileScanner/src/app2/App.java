@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
@@ -15,15 +16,16 @@ import static app.Util.wrap;
 
 public class App {
     public static Path FINISH_STUB = Path.of("");
-    private final int WORKER_NUMBER = 12;
+    private final Set<SearchWorker> runningWorkers = ConcurrentHashMap.newKeySet();
 
     private Path dirname;
     private Pattern regexp;
+    private boolean searchingDone = false;
 
     private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
             10, 100,
             1, TimeUnit.MINUTES,
-            new ArrayBlockingQueue<Runnable>(1024),
+            new ArrayBlockingQueue<>(1024),
             Executors.defaultThreadFactory(),
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
@@ -58,6 +60,9 @@ public class App {
                 log("pool size: " + pool.getPoolSize());
                 log(pool.isTerminated() + ", " + pool.isTerminating());
                 log("queue size: " + pool.getQueue().size());
+                if (searchingDone) {
+                    runningWorkers.forEach(Logger::log);
+                }
                 log("============");
             }
         });
@@ -79,7 +84,9 @@ public class App {
         Files.walkFileTree(dirname, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                pool.submit(new SearchWorker(file, regexp, map));
+                if (Files.isRegularFile(file)) {
+                    pool.submit(new SearchWorker(file, regexp, map, runningWorkers));
+                }
                 return FileVisitResult.CONTINUE;
             }
 
@@ -89,7 +96,7 @@ public class App {
                 return FileVisitResult.SKIP_SUBTREE;
             }
         });
-        queue.put(FINISH_STUB);
+        searchingDone = true;
     }
 
     private void printStatistics(ConcurrentHashMap<Path, List<String>> map) {
