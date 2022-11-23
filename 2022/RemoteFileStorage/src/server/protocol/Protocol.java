@@ -21,17 +21,22 @@ public class Protocol {
 
     public void handle() {
         try (var s = transport.getSocket()) {
-            var message = transport.receive();
-            System.out.println(message + " received");
-            if (message instanceof LoginRequest request) {
-                new LoginHandler(transport, userService).handle(request);
-            } else if (message instanceof FileListRequest request) {
-                new FileListHandler(transport, userService, fileService).handle(request);
-            } else {
-                throw new AppException("unexpected client message");
+            try {
+                var message = transport.receive();
+                System.out.println(message + " received");
+                if (message instanceof LoginRequest request) {
+                    new LoginHandler(transport, userService).handle(request);
+                } else if (message instanceof FileListRequest request) {
+                    new FileListHandler(transport, userService, fileService).handle(request);
+                } else {
+                    throw new AppException("unexpected client message");
+                }
+            }
+            catch (AppException e) {
+                transport.send(new ErrorMessage(e.getMessage()));
             }
         } catch (Throwable e) {
-            transport.send(new ErrorMessage(e.getMessage()));
+            e.printStackTrace();
         }
     }
 }
