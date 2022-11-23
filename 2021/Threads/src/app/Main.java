@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toList;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        log("hello!\b");
         Thread.currentThread().setName("main");
         log("started");
         var threads = IntStream.range(0, 10)

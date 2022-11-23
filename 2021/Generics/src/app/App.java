@@ -1,10 +1,13 @@
 package app;
 
+import java.util.List;
+
 public class App {
     public static void main(String[] args) {
         var interval = new Interval<B>();
         setB(interval);
         printSecond(interval);
+        List<String>[] x;
     }
 
     private static void setB(Interval<? super B> interval) {
