@@ -3,6 +3,7 @@ package server.protocol;
 import exception.AppException;
 import message.ErrorMessage;
 import message.FileListRequest;
+import message.FileUploadRequest;
 import message.LoginRequest;
 import server.service.FileService;
 import server.service.UserService;
@@ -28,6 +29,8 @@ public class Protocol {
                     new LoginHandler(transport, userService).handle(request);
                 } else if (message instanceof FileListRequest request) {
                     new FileListHandler(transport, userService, fileService).handle(request);
+                } else if (message instanceof FileUploadRequest request) {
+                    new FileUploadHandler(transport, userService, fileService).handle(request);
                 } else {
                     throw new AppException("unexpected client message");
                 }

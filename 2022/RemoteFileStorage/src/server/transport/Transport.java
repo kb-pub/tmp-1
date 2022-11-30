@@ -2,8 +2,10 @@ package server.transport;
 
 import exception.AppException;
 import message.Message;
+import util.Util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -43,5 +45,9 @@ public class Transport {
         catch (IOException | ClassNotFoundException | ClassCastException e) {
             throw new AppException(e.getMessage());
         }
+    }
+
+    public InputStream getInputStream() {
+        return Util.wrap(socket::getInputStream);
     }
 }

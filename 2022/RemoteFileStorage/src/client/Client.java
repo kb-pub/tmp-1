@@ -2,12 +2,17 @@ package client;
 
 import client.io.Console;
 import client.protocol.FileListHandler;
+import client.protocol.FileUploadHandler;
 import client.protocol.LoginHandler;
+import client.service.FileService;
 import client.transport.Transport;
 import exception.AppException;
 
+import java.nio.file.Path;
+
 public class Client {
     private final Console console = new Console();
+    private final FileService fileService = new FileService();
     private String token;
 
     public static void main(String[] args) {
@@ -24,6 +29,7 @@ public class Client {
                     case "login" -> login();
                     case "token" -> token();
                     case "list" -> list();
+                    case "upload" -> upload();
                     case "exit" -> console.println("bye!");
                     default -> console.println("unrecognized command");
                 }
@@ -58,5 +64,26 @@ public class Client {
             console.println("files in storage:");
             files.forEach(console::println);
         }
+    }
+
+
+    private static final String DEFAULT_FILENAME = "/home/kb/test/file-storage/local/file-to-upload.txt";
+    private void upload() {
+        console.print("enter file name (empty for default): ");
+        var filepath = console.read();
+        if (filepath.isEmpty())
+            filepath = DEFAULT_FILENAME;
+
+        var path = Path.of(filepath);
+
+        if (!fileService.exists(path))
+            throw new AppException("no file found");
+
+        fileService.withInputStream(path, input -> {
+            var filename = fileService.getFilename(path);
+            var filesize = fileService.getFilesize(path);
+            Transport.withinConnection(transport ->
+                    new FileUploadHandler(transport).upload(token, filename, filesize, input));
+        });
     }
 }

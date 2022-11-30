@@ -4,9 +4,7 @@ import exception.AppException;
 import message.Message;
 import settings.Settings;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.function.Function;
 
@@ -48,6 +46,15 @@ public class Transport {
             return (Message) in.readObject();
         }
         catch (IOException | ClassNotFoundException | ClassCastException e) {
+            throw new AppException(e.getMessage());
+        }
+    }
+
+    public OutputStream getOutputStream() {
+        try {
+            return socket.getOutputStream();
+        }
+        catch (IOException e) {
             throw new AppException(e.getMessage());
         }
     }

@@ -15,15 +15,7 @@ public class FileListHandler extends Handler {
 
     public List<String> get(String token) {
         transport.send(new FileListRequest(token));
-        var message = transport.receive();
-        if (message instanceof FileListResponse response) {
-            return response.getFiles();
-        }
-        else if (message instanceof ErrorMessage error) {
-            throw new AppException(error.getMessage());
-        }
-        else {
-            throw new AppException("unexpected message: " + message);
-        }
+        var message = extractMessageOrFail(transport.receive(), FileListResponse.class);
+        return message.getFiles();
     }
 }
