@@ -2,6 +2,7 @@ package client.transport;
 
 import message.Message;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 
 public interface Transport extends AutoCloseable {
@@ -12,4 +13,5 @@ public interface Transport extends AutoCloseable {
     Message receive();
 
     OutputStream getOutputStream();
+    InputStream getInputStream();
 }

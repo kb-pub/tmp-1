@@ -13,7 +13,7 @@ import java.util.List;
 public interface MessageStateSerializer<T extends Message> {
     void serialize(T message, DataOutputStream stream) throws IOException;
 
-    T deserialize(DataInputStream input) throws IOException;
+    T deserialize(DataInputStream stream) throws IOException;
 
     default void writeString(String text, DataOutputStream stream) throws IOException {
         text = text == null ? "" : text;
@@ -69,7 +69,7 @@ public interface MessageStateSerializer<T extends Message> {
         }
     }
 
-    default void throwIf(boolean condition, String message) {
+    default void throwIf(boolean condition, String message) throws SerializationException {
         if (condition) {
             throw new SerializationException(message);
         }

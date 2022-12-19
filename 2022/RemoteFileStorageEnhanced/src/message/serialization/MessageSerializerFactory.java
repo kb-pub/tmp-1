@@ -10,7 +10,7 @@ public class MessageSerializerFactory {
         return switch (method) {
             case "serialized" -> new SerializedMessageSerializer();
             case "quick" -> new QuickMessageSerializer();
-            default -> throw new SerializationException("no serialization method: " + method);
+            default -> throw new UnsupportedOperationException("no serialization method: " + method);
         };
     }
 }

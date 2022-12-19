@@ -11,29 +11,26 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
+import static util.Util.rethrow;
+import static util.Util.throwIf;
+
 class SocketChannelTransport implements Transport {
     private final SocketChannel channel;
     private final MessageSerializer messageSerializer;
 
     SocketChannelTransport() {
-        try {
-            channel = SocketChannel.open(new InetSocketAddress(
-                    Settings.SERVER_ADDRESS, Settings.SERVER_PORT));
-            messageSerializer = MessageSerializerFactory.get();
-        } catch (IOException e) {
-            throw new AppException(e.getMessage(), e);
-        }
+        channel = rethrow(() -> SocketChannel.open(new InetSocketAddress(
+                Settings.SERVER_ADDRESS, Settings.SERVER_PORT)));
+        messageSerializer = MessageSerializerFactory.get();
     }
 
     @Override
     public void close() {
-        try {
+        rethrow(() -> {
             if (channel != null) {
                 channel.close();
             }
-        } catch (Exception e) {
-            throw new AppException(e.getMessage(), e);
-        }
+        });
     }
 
     @Override
@@ -56,9 +53,8 @@ class SocketChannelTransport implements Transport {
                     new BufferedInputStream(channel.socket().getInputStream()));
             int length = dataStream.readInt();
             var bytes = new byte[length];
-            if (dataStream.read(bytes) < length) {
-                throw new AppException("unexpected end of input data chunk");
-            }
+            throwIf(dataStream.read(bytes) < length,
+                    "unexpected end of input data chunk");
             return messageSerializer.deserialize(bytes);
         } catch (IOException e) {
             throw new AppException(e.getMessage(), e);
@@ -67,6 +63,11 @@ class SocketChannelTransport implements Transport {
 
     @Override
     public OutputStream getOutputStream() {
-        return Util.rethrow(() -> channel.socket().getOutputStream());
+        return rethrow(() -> channel.socket().getOutputStream());
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return rethrow(() -> channel.socket().getInputStream());
     }
 }

@@ -5,33 +5,28 @@ import message.Message;
 import message.serialization.MessageSerializer;
 import message.serialization.MessageSerializerFactory;
 import settings.Settings;
-import util.Util;
 
 import java.io.*;
 import java.net.Socket;
+
+import static util.Util.rethrow;
+import static util.Util.throwIf;
 
 class SocketTransport implements Transport {
     private final Socket socket;
     private final MessageSerializer messageSerializer;
 
     SocketTransport() {
-        try {
-            socket = new Socket(Settings.SERVER_ADDRESS, Settings.SERVER_PORT);
-            messageSerializer = MessageSerializerFactory.get();
-        } catch (IOException e) {
-            throw new AppException(e.getMessage(), e);
-        }
+        socket = rethrow(() -> new Socket(Settings.SERVER_ADDRESS, Settings.SERVER_PORT));
+        messageSerializer = MessageSerializerFactory.get();
     }
 
     @Override
     public void close() {
-        try {
-            if (socket != null) {
+        rethrow(() -> {
+            if (socket != null)
                 socket.close();
-            }
-        } catch (Exception e) {
-            throw new AppException(e.getMessage(), e);
-        }
+        });
     }
 
     @Override
@@ -54,9 +49,8 @@ class SocketTransport implements Transport {
                     new BufferedInputStream(socket.getInputStream()));
             int length = dataStream.readInt();
             var bytes = new byte[length];
-            if (dataStream.read(bytes) < length) {
-                throw new AppException("unexpected end of input data chunk");
-            }
+            throwIf(dataStream.read(bytes) < length,
+                    "unexpected end of input data chunk");
             return messageSerializer.deserialize(bytes);
         } catch (IOException e) {
             throw new AppException(e.getMessage(), e);
@@ -65,6 +59,11 @@ class SocketTransport implements Transport {
 
     @Override
     public OutputStream getOutputStream() {
-        return Util.rethrow(socket::getOutputStream);
+        return rethrow(socket::getOutputStream);
+    }
+
+    @Override
+    public InputStream getInputStream() {
+        return rethrow(socket::getInputStream);
     }
 }

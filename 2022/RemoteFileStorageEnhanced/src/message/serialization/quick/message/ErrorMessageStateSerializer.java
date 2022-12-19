@@ -14,8 +14,8 @@ public class ErrorMessageStateSerializer implements MessageStateSerializer<Error
     }
 
     @Override
-    public ErrorMessage deserialize(DataInputStream input) throws IOException {
-        var errorDescription = readString(input);
+    public ErrorMessage deserialize(DataInputStream stream) throws IOException {
+        var errorDescription = readString(stream);
         return new ErrorMessage(errorDescription);
     }
 }

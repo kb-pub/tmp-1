@@ -14,8 +14,8 @@ public class FileListRequestStateSerializer implements MessageStateSerializer<Fi
     }
 
     @Override
-    public FileListRequest deserialize(DataInputStream input) throws IOException {
-        var token = readString(input);
+    public FileListRequest deserialize(DataInputStream stream) throws IOException {
+        var token = readString(stream);
         return new FileListRequest(token);
     }
 }

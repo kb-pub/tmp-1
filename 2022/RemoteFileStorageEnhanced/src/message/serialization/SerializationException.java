@@ -1,8 +1,8 @@
 package message.serialization;
 
-import exception.AppException;
+import java.io.IOException;
 
-public class SerializationException extends AppException {
+public class SerializationException extends IOException {
     public SerializationException(String message) {
         super(message);
     }

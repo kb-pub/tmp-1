@@ -20,6 +20,11 @@ public class QuickMessageSerializer implements MessageSerializer {
         put(FileUploadResponse.class, 6);
         put(LoginRequest.class, 7);
         put(LoginResponse.class, 8);
+        put(FileDownloadDone.class, 9);
+        put(FileDownloadRequest.class, 10);
+        put(FileDownloadResponse.class, 11);
+        put(FileDeleteRequest.class, 12);
+        put(FileDeleteResponse.class, 13);
     }};
     private final StateDeserializerMap stateSerializers = new StateDeserializerMap() {{
         put(ErrorMessage.class, new ErrorMessageStateSerializer());
@@ -30,10 +35,15 @@ public class QuickMessageSerializer implements MessageSerializer {
         put(FileUploadResponse.class, new FileUploadResponseStateSerializer());
         put(LoginRequest.class, new LoginRequestStateSerializer());
         put(LoginResponse.class, new LoginResponseStateSerializer());
+        put(FileDownloadDone.class, new FileDownloadDoneStateSerializer());
+        put(FileDownloadRequest.class, new FileDownloadRequestStateSerializer());
+        put(FileDownloadResponse.class, new FileDownloadResponseStateSerializer());
+        put(FileDeleteRequest.class, new FileDeleteRequestStateSerializer());
+        put(FileDeleteResponse.class, new FileDeleteResponseStateSerializer());
     }};
 
     @Override
-    public byte[] serialize(Message message) {
+    public byte[] serialize(Message message) throws SerializationException {
         try {
             var messageStateSerializer = stateSerializers.get(message.getClass());
             if (messageStateSerializer == null) {
@@ -54,7 +64,7 @@ public class QuickMessageSerializer implements MessageSerializer {
     }
 
     @Override
-    public Message deserialize(byte[] bytes) {
+    public Message deserialize(byte[] bytes) throws SerializationException {
         try {
             var dataStream = new DataInputStream(new ByteArrayInputStream(bytes));
             var messageId = dataStream.readInt();

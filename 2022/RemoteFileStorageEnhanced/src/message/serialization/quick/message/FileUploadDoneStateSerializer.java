@@ -14,7 +14,7 @@ public class FileUploadDoneStateSerializer implements MessageStateSerializer<Fil
     }
 
     @Override
-    public FileUploadDone deserialize(DataInputStream input) throws IOException {
+    public FileUploadDone deserialize(DataInputStream stream) throws IOException {
         return new FileUploadDone();
     }
 }

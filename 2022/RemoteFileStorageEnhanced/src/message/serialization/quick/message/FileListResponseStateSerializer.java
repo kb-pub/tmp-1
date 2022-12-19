@@ -14,8 +14,8 @@ public class FileListResponseStateSerializer implements MessageStateSerializer<F
     }
 
     @Override
-    public FileListResponse deserialize(DataInputStream input) throws IOException {
-        var files = readStringList(input);
+    public FileListResponse deserialize(DataInputStream stream) throws IOException {
+        var files = readStringList(stream);
         return new FileListResponse(files);
     }
 }

@@ -4,11 +4,11 @@ import message.ErrorMessage;
 import message.serialization.serialized.SerializedMessageSerializer;
 
 public class SerializedMessageSerializerTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         new SerializedMessageSerializerTest().test();
     }
 
-    void test() {
+    void test() throws Exception {
         var serializer = new SerializedMessageSerializer();
         var message = new ErrorMessage("test message");
         var bytes = serializer.serialize(message);

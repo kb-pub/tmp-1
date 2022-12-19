@@ -3,6 +3,7 @@ package util;
 import exception.AppException;
 
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 public class Util {
     public static <T> T rethrow(Callable<T> action) {
@@ -23,5 +24,11 @@ public class Util {
 
     public interface ThrowableRunnable {
         void run() throws Exception;
+    }
+
+    public static void throwIf(boolean condition, String errorMessage) {
+        if (condition) {
+            throw new AppException(errorMessage);
+        }
     }
 }
