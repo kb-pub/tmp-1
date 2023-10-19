@@ -1,7 +1,7 @@
 package solve.stream;
 
-import app.domain.Person;
-import app.domain.PersonFactory;
+import solve.domain.Person;
+import solve.domain.PersonFactory;
 
 import java.util.Comparator;
 import java.util.Scanner;
