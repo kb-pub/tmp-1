@@ -3,8 +3,9 @@ package app.stream;
 import app.domain.Person;
 import app.domain.RandomPersonFactory;
 
-import java.util.Random;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -112,41 +113,73 @@ public class Main {
 
     // TODO Простое сведЕние: max, min, findFirst, findAny, anyMatch, allMatch, noneMatch
     void ex8() {
+//        getPersonStream()
+//                .min(Comparator.comparing(Person::getBirthdate))
+////                .findAny()
+//                .ifPresentOrElse(
+//                        this::log,
+//                        () -> log("no person")
+//                );
 
+        var result = getPersonStream()
+                .anyMatch(p -> p.getBirthdate().isAfter(LocalDate.of(2020, 1, 1)));
+        log(result);
     }
 
     // TODO Перемножить числа из потока (reduce)
     void ex9() {
+        getIntStream()
+                .mapToLong(x -> x)
+                .reduce((x, y) -> x * y)
+                .ifPresentOrElse(
+                        this::log,
+                        () -> log("no person")
+                );
     }
 
     // TODO Склеить ФИО персон через запятую (reduce)
     void ex10() {
-
+        getPersonStream()
+                .map(Person::getFullName)
+                .reduce((total, fio) -> total + ", " + fio)
+                .ifPresent(this::log);
     }
 
     // TODO Накопить персоны в разных коллекциях (collect)
     void ex11() {
-
+        var res = getPersonStream()
+                .collect(Collectors.toMap(Person::getName, x -> x, (oldPerson, newPerson) -> newPerson));
+        log(res);
     }
 
     // TODO Сгруппировать по одинаковому имени (groupingBy)
     void ex12() {
-
+        getPersonStream()
+                .collect(Collectors.groupingBy(Person::getName))
+                .forEach((name, persons) -> log(name + " -> " + persons));
     }
 
     // TODO ... во множество (toSet)
     void ex13() {
-
+        getPersonStream()
+                .collect(Collectors.groupingBy(Person::getName, Collectors.toSet()))
+                .forEach((name, persons) -> log(name + " -> " + persons));
     }
 
     // TODO ... по количеству таких персон (counting)
     void ex14() {
-
+        getPersonStream()
+                .collect(Collectors.groupingBy(Person::getName, Collectors.counting()))
+                .forEach((name, persons) -> log(name + " -> " + persons));
     }
 
     // TODO ... накопить только фамилии без повторений (mapping)
     void ex15() {
-
+        getPersonStream()
+                .collect(Collectors.groupingBy(
+                        Person::getName,
+                        Collectors.mapping(Person::getSurname, Collectors.toSet())))
+                .forEach((name, persons) -> log(name + " -> " + persons));
     }
 
     void log(Object o) {

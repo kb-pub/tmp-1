@@ -31,13 +31,17 @@ public class Person implements Comparable<Person> {
         return surname;
     }
 
+    public String getFullName() {
+        return name + " " + surname;
+    }
+
     public LocalDate getBirthdate() {
         return birthdate;
     }
 
     @Override
     public String toString() {
-        return "%d -> %s %s, %s".formatted(id, name, surname, birthdate);
+        return "[%d] %s %s (%s)".formatted(id, name, surname, birthdate);
     }
 
     public static final Comparator<Person> COMPARATOR =
